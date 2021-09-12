@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
 
 class RegisterScreen extends StatelessWidget {
+  String? valid(value) {
+    if (value == null || value.isEmpty) {
+      return 'Vui lòng nhập thông tin';
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -12,15 +19,10 @@ class RegisterScreen extends StatelessWidget {
           TextFormField(
             decoration: const InputDecoration(
               icon: Icon(Icons.person),
-              labelText: 'Họ *',
+              hintText: 'Họ',
             ),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Vui lòng nhập thông tin';
-              }
-              return null;
-            },
-          )
+            validator: (value) => valid(value),
+          ),
         ],
       ),
     );

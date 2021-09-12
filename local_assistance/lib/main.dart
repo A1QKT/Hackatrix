@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import './widgets/register_screen.dart';
+import 'screen/register_screen.dart';
 
 void main() {
   runApp(MyApp());
