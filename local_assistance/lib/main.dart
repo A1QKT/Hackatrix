@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import './widgets/register_screen.dart';
 
 void main() {
   runApp(MyApp());
@@ -9,7 +10,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Local Assistance',
-      home: MyHomePage(),
+      home: RegisterScreen(),
     );
   }
 }
