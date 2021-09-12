@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:local_assistance/screens/login_screen.dart';
 import '/screens/acception_screen.dart';
 
 void main() {
@@ -10,9 +11,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Local Assistance',
-      initialRoute: AcceptionScreen.routName,
+      initialRoute: LoginScreen.routeName,
       routes: {
         AcceptionScreen.routName: (ctx) => AcceptionScreen(),
+        LoginScreen.routeName: (ctx) => LoginScreen(),
       },
     );
   }
