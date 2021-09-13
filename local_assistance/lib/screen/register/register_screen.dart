@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../models/personal_info.dart';
 import './components/PasswordField.dart';
 import './components/EmailField.dart';
 import './components/VerifyField.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class RegisterScreen extends StatelessWidget {
   final _passwordFocusNode = FocusNode();
@@ -11,24 +11,19 @@ class RegisterScreen extends StatelessWidget {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _verifyPasswordController = TextEditingController();
+  final _auth = FirebaseAuth.instance;
 
-  void saveAccount() {
+  void saveAccount() async {
+    _auth.createUserWithEmailAndPassword(
+      email: _emailController.text,
+      password: _passwordController.text,
+    );
+
     final isValid = _form.currentState.validate();
     if (!isValid) {
       return;
     }
     _form.currentState.save();
-
-    var newAcc = PersonalInfo(
-      firstname: '',
-      lastname: '',
-      personalID: '',
-      nation: '',
-      gender: '',
-      dateOfBirth: DateTime.now(),
-      username: _emailController.text,
-      password: _passwordController.text,
-    );
   }
 
   @override
@@ -62,13 +57,18 @@ class RegisterScreen extends StatelessWidget {
               InkWell(
                 onTap: saveAccount,
                 child: Container(
+                  alignment: Alignment.center,
+                  width: size.width * 0.3,
                   margin: EdgeInsets.symmetric(vertical: 10),
                   padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                   decoration: BoxDecoration(
                     color: Color(0xffcdc3af),
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: Text('Đăng ký'),
+                  child: Text(
+                    'Đăng ký',
+                    textScaleFactor: 1.3,
+                  ),
                 ),
               ),
             ],
