@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class TextFieldContainer extends StatelessWidget {
   final Widget child;
-  TextFieldContainer({required this.child});
+  TextFieldContainer({@required this.child});
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;

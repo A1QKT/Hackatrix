@@ -1,82 +1,66 @@
 import 'package:flutter/material.dart';
-import 'components/TextFieldContainer.dart';
-import 'package:form_field_validator/form_field_validator.dart';
+import '../../models/personal_info.dart';
+import './components/PasswordField.dart';
+import './components/EmailField.dart';
+import './components/VerifyField.dart';
 
 class RegisterScreen extends StatelessWidget {
   final _passwordFocusNode = FocusNode();
-  final _minorPasswordFocusNode = FocusNode();
-  // abc
+  final _verifyPasswordFocusNode = FocusNode();
+  final _form = GlobalKey<FormState>();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _verifyPasswordController = TextEditingController();
+
+  void saveAccount() {
+    final isValid = _form.currentState.validate();
+    if (!isValid) {
+      return;
+    }
+    _form.currentState.save();
+
+    var newAcc = PersonalInfo(
+      firstname: '',
+      lastname: '',
+      personalID: '',
+      nation: '',
+      gender: '',
+      dateOfBirth: DateTime.now(),
+      username: _emailController.text,
+      password: _passwordController.text,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
+
     return Scaffold(
       body: Container(
         height: size.height,
         width: double.infinity,
         child: Form(
-          autovalidate: true,
+          key: _form,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              TextFieldContainer(
-                child: TextFormField(
-                  textInputAction: TextInputAction.next,
-                  decoration: const InputDecoration(
-                    icon: Icon(Icons.person),
-                    hintText: 'Vui lòng nhập email của bạn!',
-                    labelText: 'Email',
-                    border: InputBorder.none,
-                  ),
-                  onFieldSubmitted: (_) {
-                    FocusScope.of(context).requestFocus(_passwordFocusNode);
-                  },
-                  validator: emailValidator(),
-                ),
+              EmailField(
+                emailController: _emailController,
+                passwordFocusNode: _passwordFocusNode,
               ),
-              TextFieldContainer(
-                child: TextFormField(
-                  focusNode: _passwordFocusNode,
-                  onFieldSubmitted: (_) {
-                    FocusScope.of(context)
-                        .requestFocus(_minorPasswordFocusNode);
-                  },
-                  obscureText: true,
-                  textInputAction: TextInputAction.next,
-                  decoration: const InputDecoration(
-                    icon: Icon(Icons.password),
-                    hintText: 'Vui lòng nhập mật khẩu!',
-                    labelText: 'Mật khẩu',
-                    border: InputBorder.none,
-                    suffixIcon: Icon(
-                      Icons.visibility,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  validator: passwordValidator(),
-                ),
+              PasswordField(
+                passwordController: _passwordController,
+                passwordFocusNode: _passwordFocusNode,
+                verifyPasswordFocusNode: _verifyPasswordFocusNode,
               ),
-              TextFieldContainer(
-                child: TextFormField(
-                  focusNode: _minorPasswordFocusNode,
-                  obscureText: true,
-                  textInputAction: TextInputAction.next,
-                  decoration: const InputDecoration(
-                    icon: Icon(Icons.password),
-                    hintText: 'Vui lòng nhập mật khẩu!',
-                    labelText: 'Xác nhận mật khẩu',
-                    border: InputBorder.none,
-                    suffixIcon: Icon(
-                      Icons.visibility,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  validator:
-                      RequiredValidator(errorText: 'Yêu cầu nhập mật khẩu'),
-                ),
+              VerifyField(
+                verifyPasswordController: _verifyPasswordController,
+                verifyPasswordFocusNode: _verifyPasswordFocusNode,
+                passwordController: _passwordController,
               ),
               InkWell(
-                onTap: null,
+                onTap: saveAccount,
                 child: Container(
                   margin: EdgeInsets.symmetric(vertical: 10),
                   padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
@@ -93,24 +77,4 @@ class RegisterScreen extends StatelessWidget {
       ),
     );
   }
-}
-
-MultiValidator emailValidator() {
-  return MultiValidator([
-    RequiredValidator(errorText: 'Vui lòng nhập email'),
-    EmailValidator(errorText: 'Vui lòng nhập email hợp lệ'),
-  ]);
-}
-
-MultiValidator passwordValidator() {
-  return MultiValidator([
-    RequiredValidator(errorText: 'Yêu cầu nhập mật khẩu'),
-    MinLengthValidator(8, errorText: 'Mật khẩu gồm ít nhất 6 ký tự '),
-    PatternValidator(r'(?=.*?[#?!@$%^&*-])',
-        errorText: 'Mật khẩu bắt buộc có ít nhất một ký tự đặc biệt'),
-    PatternValidator('[0-9]',
-        errorText: 'Mật khẩu bắt buộc có ít nhất một chữ số'),
-    PatternValidator('[A-Z]',
-        errorText: 'Mật khẩu bắt buộc có ít nhất một chữ số'),
-  ]);
 }
