@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-import '../widgets/login_item.dart';
+import 'login_item.dart';
 
 class LoginScreen extends StatelessWidget {
   static String routeName = "/login";
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.amber,
+      backgroundColor: Colors.amber[100],
       body: Center(child: LoginItem()),
     );
   }

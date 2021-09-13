@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:local_assistance/screens/login_screen.dart';
+import 'package:local_assistance/login/login_screen.dart';
 import '/screens/acception_screen.dart';
 
 void main() {
