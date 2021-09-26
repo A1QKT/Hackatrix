@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:local_assistance/login/login_screen.dart';
-import '/screens/acception_screen.dart';
+
+import 'screens/acception/acception_screen.dart';
+import './screens/login/login_screen.dart';
 
 void main() {
   runApp(MyApp());

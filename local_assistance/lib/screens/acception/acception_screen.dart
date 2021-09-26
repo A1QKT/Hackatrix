@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../widgets/acception_widget.dart';
+import '../../widgets/acception_widget.dart';
 
 class AcceptionScreen extends StatelessWidget {
   static String routName = '/acception-screen';
