@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'package:permission_handler/permission_handler.dart';
-
-
 class AcceptionWidget extends StatelessWidget {
   final String title;
   final String subTitle;
