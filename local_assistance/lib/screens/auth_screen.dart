@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:local_assistance/providers/auth.dart';
+import '../constant/regex_const.dart';
+
 enum AuthStatus {
   login,
   signup,
@@ -34,16 +38,59 @@ class AuthFeature extends StatefulWidget {
 }
 
 class _AuthFeatureState extends State<AuthFeature> {
+  FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   AuthStatus _authStatus = AuthStatus.login;
-  final authData = {
+  bool _isLoading = false;
+  Map _authData = {
     "userName": null,
-    "gmail": null,
+    "email": null,
     "password": null,
   };
-  final focusPassword = FocusNode();
-  final focusConfirmPassword = FocusNode();
+  final _focusPassword = FocusNode();
+  final _focusConfirmPassword = FocusNode();
   final _form = GlobalKey<FormState>();
   TextEditingController _email = TextEditingController();
+
+  Future<void> _onSubmitted() async {
+    if (!_form.currentState.validate()) return;
+    _form.currentState.save();
+    print(_authData);
+    if (_authStatus == AuthStatus.login) {
+      print("login");
+      try {
+        await _firebaseAuth.signInWithEmailAndPassword(
+            email: _authData["email"], password: _authData["password"]);
+      } on FirebaseAuthException catch (error) {
+        if (error.code == 'user-not-found') {
+          ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('No user found for that email.')));
+        } else if (error.code == 'wrong-password') {
+          SnackBar(content: Text('Wrong password provided for that user.'));
+        }
+      } catch (error) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text("Something went wrong")));
+      }
+    } else {
+      print("signup");
+      try {
+        await _firebaseAuth.createUserWithEmailAndPassword(
+            email: _authData["email"], password: _authData["password"]);
+      } on FirebaseAuthException catch (error) {
+        if (error.code == 'weak-password') {
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text("weak password")));
+        } else if (error.code == 'email-already-in-use') {
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text("email already exist")));
+        }
+      } catch (error) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text("Something went wrong")));
+      }
+    }
+  }
+
   @override
   void dispose() {
     super.dispose();
@@ -59,6 +106,7 @@ class _AuthFeatureState extends State<AuthFeature> {
           children: [
             Container(
               padding: EdgeInsets.fromLTRB(20, 0, 0, 0),
+              height: 60,
               width: 350,
               decoration: BoxDecoration(
                 color: Colors.amber[200],
@@ -67,20 +115,29 @@ class _AuthFeatureState extends State<AuthFeature> {
               ),
               child: TextFormField(
                 decoration: InputDecoration(
-                  labelText: "Gmail",
+                  labelText: "Email",
                   border: InputBorder.none,
                   enabledBorder: InputBorder.none,
                   errorBorder: InputBorder.none,
                   disabledBorder: InputBorder.none,
                 ),
+                textInputAction: TextInputAction.next,
+                validator: (value) {
+                  if (!value.contains("@")) return "Invalid email";
+                  return null;
+                },
                 onFieldSubmitted: (_) {
-                  FocusScope.of(context).requestFocus(focusPassword);
+                  FocusScope.of(context).requestFocus(_focusPassword);
+                },
+                onSaved: (value) {
+                  _authData["email"] = value;
                 },
               ),
             ),
             SizedBox(height: 8),
             Container(
               width: 350,
+              height: 60,
               padding: EdgeInsets.fromLTRB(20, 0, 0, 0),
               decoration: BoxDecoration(
                 color: Colors.amber[200],
@@ -88,7 +145,9 @@ class _AuthFeatureState extends State<AuthFeature> {
                 borderRadius: BorderRadius.circular(30),
               ),
               child: TextFormField(
+                focusNode: _focusPassword,
                 controller: _email,
+                obscureText: true,
                 decoration: InputDecoration(
                   labelText: "Password",
                   border: InputBorder.none,
@@ -96,14 +155,20 @@ class _AuthFeatureState extends State<AuthFeature> {
                   errorBorder: InputBorder.none,
                   disabledBorder: InputBorder.none,
                 ),
+                textInputAction: (_authStatus == AuthStatus.login)
+                    ? TextInputAction.done
+                    : TextInputAction.next,
                 validator: (value) {
                   if (value.length < 6) return "Password must greater than 6";
                   return null;
                 },
                 onFieldSubmitted: (value) {
                   if (_authStatus == AuthStatus.signup) {
-                    FocusScope.of(context).requestFocus();
+                    FocusScope.of(context).requestFocus(_focusConfirmPassword);
                   }
+                },
+                onSaved: (value) {
+                  _authData["password"] = value;
                 },
               ),
             ),
@@ -111,6 +176,7 @@ class _AuthFeatureState extends State<AuthFeature> {
             if (_authStatus == AuthStatus.signup)
               Container(
                 width: 350,
+                height: 60,
                 padding: EdgeInsets.fromLTRB(20, 0, 0, 0),
                 decoration: BoxDecoration(
                   color: Colors.amber[200],
@@ -118,6 +184,8 @@ class _AuthFeatureState extends State<AuthFeature> {
                   borderRadius: BorderRadius.circular(30),
                 ),
                 child: TextFormField(
+                  focusNode: _focusConfirmPassword,
+                  obscureText: true,
                   decoration: InputDecoration(
                     labelText: "Confirm password",
                     border: InputBorder.none,
@@ -137,6 +205,7 @@ class _AuthFeatureState extends State<AuthFeature> {
             Container(
               alignment: Alignment.center,
               width: 350,
+              height: 60,
               padding: EdgeInsets.fromLTRB(0, 4, 0, 4),
               decoration: BoxDecoration(
                 color: Colors.amber[300],
@@ -144,7 +213,7 @@ class _AuthFeatureState extends State<AuthFeature> {
                 borderRadius: BorderRadius.circular(30),
               ),
               child: FlatButton(
-                onPressed: () {},
+                onPressed: _onSubmitted,
                 child: (_authStatus == AuthStatus.login)
                     ? Text("login")
                     : Text("signup"),
