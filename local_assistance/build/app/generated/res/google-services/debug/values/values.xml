@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="default_web_client_id" translatable="false">1057783049186-5pjcplnqidsdeg6k9ouv9b1soe070brq.apps.googleusercontent.com</string>
+    <string name="gcm_defaultSenderId" translatable="false">1057783049186</string>
+    <string name="google_api_key" translatable="false">AIzaSyCYo1gOaY0nBl-ahpWb87QqrJPDpUXd1M0</string>
+    <string name="google_app_id" translatable="false">1:1057783049186:android:bc6a50addb90ca55df27bb</string>
+    <string name="google_crash_reporting_api_key" translatable="false">AIzaSyCYo1gOaY0nBl-ahpWb87QqrJPDpUXd1M0</string>
+    <string name="google_storage_bucket" translatable="false">dummy-local-assistance.appspot.com</string>
+    <string name="project_id" translatable="false">dummy-local-assistance</string>
+</resources>

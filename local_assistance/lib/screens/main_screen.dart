@@ -17,6 +17,7 @@ class _MainSCreenState extends State<MainSCreen> {
     // CollectionReference userInformations =
     //     FirebaseFirestore.instance.collection("userInformations");
     return Scaffold(
+      appBar: AppBar(),
       drawer: DrawerSheet(),
       body: _isNavigate
           ? SingleChildScrollView(
