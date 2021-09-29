@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:local_assistance/screens/history_screen.dart';
-import 'package:local_assistance/screens/profile_screen.dart';
-import 'package:local_assistance/screens/setting_screen.dart';
 
 import 'screens/acception/acception_screen.dart';
 import 'screens/auth_screen.dart';
@@ -28,9 +25,6 @@ class MyApp extends StatelessWidget {
           }),
       routes: {
         AcceptionScreen.routName: (ctx) => AcceptionScreen(),
-        ProfileScreen.routName: (ctx) => ProfileScreen(),
-        SettingScreen.routName: (ctx) => SettingScreen(),
-        HistoryScreen.routName: (ctx) => HistoryScreen(),
       },
     );
   }
