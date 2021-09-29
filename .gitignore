@@ -6,6 +6,14 @@ ios/Runner/GoogleService-Info.plist
 # Created by https://www.toptal.com/developers/gitignore/api/firebase,flutter,visualstudio,macos,windows
 # Edit at https://www.toptal.com/developers/gitignore?templates=firebase,flutter,visualstudio,macos,windows
 
+
+.DS_Store
+local_assistance/.dart_tool/**
+local_assistance/.packages
+local_assistance/build/**
+
+
+
 ### Firebase ###
 .idea
 **/node_modules/*
