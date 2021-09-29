@@ -4,7 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import './drawer.dart';
 import '../widgets/main_feature.dart';
 import '../widgets/climate_feature.dart';
-import '../';
 
 class MainSCreen extends StatefulWidget {
   @override
