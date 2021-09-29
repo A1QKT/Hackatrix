@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:local_assistance/screens/question_screen.dart';
 
 class MainFeature extends StatelessWidget {
   final String featureName;
@@ -9,7 +10,13 @@ class MainFeature extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        print("ok");
+        Navigator.pushNamed(
+          context,
+          QuestionScreen.routName,
+          arguments: {
+            'name': featureName,
+          },
+        );
       },
       child: Card(
         shape: RoundedRectangleBorder(

@@ -9,11 +9,15 @@ class MainSCreen extends StatefulWidget {
   _MainSCreenState createState() => _MainSCreenState();
 }
 
+Size screenSize;
+
 class _MainSCreenState extends State<MainSCreen> {
   bool _isNavigate = true;
   int _currentIndex = 0;
+
   @override
   Widget build(BuildContext context) {
+    screenSize = MediaQuery.of(context).size;
     // CollectionReference userInformations =
     //     FirebaseFirestore.instance.collection("userInformations");
     return Scaffold(
