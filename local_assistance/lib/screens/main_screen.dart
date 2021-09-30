@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import './drawer.dart';
 import '../widgets/main_feature.dart';
 import '../widgets/wallet.dart';
+import './menu_screen.dart';
 
 class MainSCreen extends StatefulWidget {
   @override
@@ -60,7 +61,6 @@ class _MainSCreenState extends State<MainSCreen> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (index) {
-          print(index);
           setState(() {
             _currentIndex = index;
             if (index == 0)

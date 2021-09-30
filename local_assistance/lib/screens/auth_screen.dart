@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
@@ -51,6 +52,76 @@ class _AuthFeatureState extends State<AuthFeature> {
   final _form = GlobalKey<FormState>();
   TextEditingController _email = TextEditingController();
 
+  Future<void> _pushData(String typeOfUsers) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection("$typeOfUsers")
+          .add({"userName": "dummy"});
+    } catch (error) {
+      print(error);
+      throw error;
+    }
+  }
+
+  Future<void> _signUp(String typeOfUser) async {
+    try {
+      await _pushData(typeOfUser);
+    } on FirebaseException catch (error) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(error.message)));
+    } catch (error) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(error.message)));
+    }
+    try {
+      await _firebaseAuth.createUserWithEmailAndPassword(
+          email: _authData["email"], password: _authData["password"]);
+    } on FirebaseAuthException catch (error) {
+      if (error.code == 'weak-password') {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text("weak password")));
+      } else if (error.code == 'email-already-in-use') {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text("email already exist")));
+      }
+    } catch (error) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("Something went wrong")));
+    }
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  Future<void> _showDiagram() {
+    return showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text("You are?"),
+        actions: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              FlatButton(
+                  onPressed: () async {
+                    await _signUp("Local");
+                    Navigator.of(ctx).pop();
+                  },
+                  child: Text("Local")),
+              FlatButton(
+                onPressed: () async {
+                  await _signUp("User");
+                  Navigator.of(ctx).pop();
+                },
+                child: Text("User"),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<void> _onSubmitted() async {
     if (!_form.currentState.validate()) return;
     _form.currentState.save();
@@ -77,27 +148,7 @@ class _AuthFeatureState extends State<AuthFeature> {
         _isLoading = false;
       });
     } else {
-      setState(() {
-        _isLoading = true;
-      });
-      try {
-        await _firebaseAuth.createUserWithEmailAndPassword(
-            email: _authData["email"], password: _authData["password"]);
-      } on FirebaseAuthException catch (error) {
-        if (error.code == 'weak-password') {
-          ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text("weak password")));
-        } else if (error.code == 'email-already-in-use') {
-          ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text("email already exist")));
-        }
-      } catch (error) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text("Something went wrong")));
-      }
-      setState(() {
-        _isLoading = false;
-      });
+      _showDiagram();
     }
   }
 
