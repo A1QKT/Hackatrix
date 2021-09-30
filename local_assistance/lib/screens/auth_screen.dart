@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
@@ -74,8 +75,14 @@ class _AuthFeatureState extends State<AuthFeature> {
     } else {
       print("signup");
       try {
-        await _firebaseAuth.createUserWithEmailAndPassword(
-            email: _authData["email"], password: _authData["password"]);
+        UserCredential user =
+            await _firebaseAuth.createUserWithEmailAndPassword(
+                email: _authData["email"], password: _authData["password"]);
+        FirebaseFirestore.instance.collection('users').doc(user.user.uid).set({
+          'fullname': '',
+          'location': '',
+          'phonenumber': '',
+        });
       } on FirebaseAuthException catch (error) {
         if (error.code == 'weak-password') {
           ScaffoldMessenger.of(context)
