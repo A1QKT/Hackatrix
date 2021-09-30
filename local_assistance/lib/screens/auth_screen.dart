@@ -56,7 +56,9 @@ class _AuthFeatureState extends State<AuthFeature> {
     _form.currentState.save();
     print(_authData);
     if (_authStatus == AuthStatus.login) {
-      print("login");
+      setState(() {
+        _isLoading = true;
+      });
       try {
         await _firebaseAuth.signInWithEmailAndPassword(
             email: _authData["email"], password: _authData["password"]);
@@ -71,8 +73,13 @@ class _AuthFeatureState extends State<AuthFeature> {
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text("Something went wrong")));
       }
+      setState(() {
+        _isLoading = false;
+      });
     } else {
-      print("signup");
+      setState(() {
+        _isLoading = true;
+      });
       try {
         await _firebaseAuth.createUserWithEmailAndPassword(
             email: _authData["email"], password: _authData["password"]);
@@ -88,6 +95,9 @@ class _AuthFeatureState extends State<AuthFeature> {
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text("Something went wrong")));
       }
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -227,6 +237,7 @@ class _AuthFeatureState extends State<AuthFeature> {
                     });
                   },
                   child: Text("Create your account")),
+            if (_isLoading) CircularProgressIndicator()
           ],
         ),
       ),
