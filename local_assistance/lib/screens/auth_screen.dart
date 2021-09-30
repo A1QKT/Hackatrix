@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:http/http.dart';
 import 'package:local_assistance/providers/auth.dart';
 import '../constant/regex_const.dart';
 
@@ -46,17 +48,19 @@ class _AuthFeatureState extends State<AuthFeature> {
     "userName": null,
     "email": null,
     "password": null,
+    "userStatus": null,
   };
   final _focusPassword = FocusNode();
   final _focusConfirmPassword = FocusNode();
   final _form = GlobalKey<FormState>();
   TextEditingController _email = TextEditingController();
 
-  Future<void> _pushData(String typeOfUsers) async {
+  Future<void> _pushData(String typeOfUsers, String userId) async {
     try {
-      await FirebaseFirestore.instance
-          .collection("$typeOfUsers")
-          .add({"userName": "dummy"});
+      await FirebaseFirestore.instance.collection(typeOfUsers).doc(userId).set({
+        "username": "dummy",
+        "userStatus": _authData["userStatus"],
+      });
     } catch (error) {
       print(error);
       throw error;
@@ -65,18 +69,13 @@ class _AuthFeatureState extends State<AuthFeature> {
 
   Future<void> _signUp(String typeOfUser) async {
     try {
-      await _pushData(typeOfUser);
-    } on FirebaseException catch (error) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(error.message)));
-    } catch (error) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(error.message)));
-    }
-    try {
-      await _firebaseAuth.createUserWithEmailAndPassword(
+      final response = await _firebaseAuth.createUserWithEmailAndPassword(
           email: _authData["email"], password: _authData["password"]);
+      await _pushData(typeOfUser, response.user.uid);
     } on FirebaseAuthException catch (error) {
+      setState(() {
+        _isLoading = false;
+      });
       if (error.code == 'weak-password') {
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text("weak password")));
@@ -84,13 +83,20 @@ class _AuthFeatureState extends State<AuthFeature> {
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text("email already exist")));
       }
+    } on FirebaseException catch (error) {
+      setState(() {
+        _isLoading = false;
+      });
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(error.message)));
     } catch (error) {
+      setState(() {
+        _isLoading = false;
+      });
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text("Something went wrong")));
+      print(error);
     }
-    setState(() {
-      _isLoading = false;
-    });
   }
 
   Future<void> _showDiagram() {
@@ -104,14 +110,18 @@ class _AuthFeatureState extends State<AuthFeature> {
             children: [
               FlatButton(
                   onPressed: () async {
-                    await _signUp("Local");
+                    Provider.of<Auth>(ctx, listen: false)
+                        .setUserStatus(UserStatus.local);
                     Navigator.of(ctx).pop();
+                    await _signUp("Locals");
                   },
                   child: Text("Local")),
               FlatButton(
                 onPressed: () async {
-                  await _signUp("User");
+                  Provider.of<Auth>(ctx, listen: false)
+                      .setUserStatus(UserStatus.traveller);
                   Navigator.of(ctx).pop();
+                  await _signUp("Users");
                 },
                 child: Text("User"),
               ),
@@ -125,7 +135,6 @@ class _AuthFeatureState extends State<AuthFeature> {
   Future<void> _onSubmitted() async {
     if (!_form.currentState.validate()) return;
     _form.currentState.save();
-    print(_authData);
     if (_authStatus == AuthStatus.login) {
       setState(() {
         _isLoading = true;
@@ -148,6 +157,9 @@ class _AuthFeatureState extends State<AuthFeature> {
         _isLoading = false;
       });
     } else {
+      setState(() {
+        _isLoading = true;
+      });
       _showDiagram();
     }
   }
