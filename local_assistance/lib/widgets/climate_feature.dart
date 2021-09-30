@@ -50,11 +50,11 @@ class _ClimateFeatureState extends State<ClimateFeature> {
           return CircularProgressIndicator();
         if (snapShot.error != null) return Text("Not found");
         return Container(
-          height: 100,
-          width: 100,
+          height: 50,
+          width: 50,
           decoration: BoxDecoration(
             color: Colors.blueAccent,
-            border: Border.all(),
+            border: Border.all(width: 0.5),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Stack(
