@@ -4,11 +4,9 @@ import 'package:local_assistance/screens/main_screen.dart';
 class HashtagWidget extends StatefulWidget {
   const HashtagWidget({
     Key key,
-    @required this.hashtag,
     @required this.hashtagStatus,
   }) : super(key: key);
 
-  final List<String> hashtag;
   final Map<String, bool> hashtagStatus;
 
   @override
@@ -18,6 +16,9 @@ class HashtagWidget extends StatefulWidget {
 class _HashtagWidgetState extends State<HashtagWidget> {
   @override
   Widget build(BuildContext context) {
+    List<String> hashtag = widget.hashtagStatus.entries.map((e) {
+      return e.key;
+    }).toList();
     return Container(
       margin: EdgeInsets.all(10),
       decoration: BoxDecoration(
@@ -51,7 +52,7 @@ class _HashtagWidgetState extends State<HashtagWidget> {
               childAspectRatio: 4,
               crossAxisCount: 2,
               mainAxisSpacing: 10,
-              children: widget.hashtag.map((element) {
+              children: hashtag.map((element) {
                 return GestureDetector(
                   onTap: () {
                     setState(() {

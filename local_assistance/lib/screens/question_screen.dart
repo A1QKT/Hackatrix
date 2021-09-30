@@ -8,7 +8,6 @@ class QuestionScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Map<String, dynamic> args = ModalRoute.of(context).settings.arguments;
-    List<String> hashtag = k_hashtag[args['name']];
     Map<String, bool> hashtagStatus = k_hashtagStatus[args['name']];
     return GestureDetector(
       onTap: () => FocusScope.of(context).requestFocus(new FocusNode()),
@@ -20,7 +19,7 @@ class QuestionScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              HashtagWidget(hashtag: hashtag, hashtagStatus: hashtagStatus),
+              HashtagWidget(hashtagStatus: hashtagStatus),
               QuestionFieldWidget(hashtagStatus: hashtagStatus),
             ],
           ),
