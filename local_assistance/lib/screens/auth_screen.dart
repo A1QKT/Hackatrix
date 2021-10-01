@@ -56,10 +56,11 @@ class _AuthFeatureState extends State<AuthFeature> {
 
   Future<void> _pushData(String typeOfUsers, String userId) async {
     try {
-      await FirebaseFirestore.instance
-          .collection(typeOfUsers)
-          .doc(userId)
-          .set({"username": "dummy"});
+      await FirebaseFirestore.instance.collection(typeOfUsers).doc(userId).set({
+        'fullname': '',
+        'location': '',
+        'phonenumber': '',
+      });
     } catch (error) {
       print(error);
       throw error;
@@ -163,6 +164,10 @@ class _AuthFeatureState extends State<AuthFeature> {
         _isLoading = true;
       });
       _showDiagram();
+
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
