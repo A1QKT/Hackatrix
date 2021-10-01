@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:local_assistance/screens/history_screen.dart';
@@ -16,17 +18,41 @@ class DrawerSheet extends StatelessWidget {
             children: [
               Container(
                 margin: EdgeInsets.all(10),
-                child: CircleAvatar(
-                  radius: size.width * 0.17,
-                ),
+                child: FutureBuilder(
+                    future: FirebaseStorage.instance
+                        .ref('user_image/' +
+                            FirebaseAuth.instance.currentUser.uid +
+                            '.jpg')
+                        .getDownloadURL(),
+                    builder: (context, snapshot) {
+                      return CircleAvatar(
+                        radius: size.width * 0.17,
+                        backgroundColor: Colors.amberAccent,
+                        backgroundImage: snapshot.data != null
+                            ? NetworkImage(snapshot.data)
+                            : null,
+                      );
+                    }),
               ),
               SizedBox(height: 15),
-              Text(
-                'Name',
-                style: TextStyle(
-                  fontSize: 20,
-                ),
-              ),
+              FutureBuilder(
+                  future: FirebaseFirestore.instance
+                      .collection('users')
+                      .doc(FirebaseAuth.instance.currentUser.uid)
+                      .get(),
+                  builder: (context,
+                      AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>>
+                          snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Text('Loading...');
+                    }
+                    return Text(
+                      snapshot.data.data()['fullname'],
+                      style: TextStyle(
+                        fontSize: 20,
+                      ),
+                    );
+                  }),
               SizedBox(height: 15),
               Text(FirebaseAuth.instance.currentUser.email),
               SizedBox(height: 15),
