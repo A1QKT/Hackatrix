@@ -1,10 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:http/http.dart';
-import 'package:local_assistance/providers/auth.dart';
+
+import '../providers/auth.dart';
 import '../constant/regex_const.dart';
 
 enum AuthStatus {
@@ -57,10 +56,10 @@ class _AuthFeatureState extends State<AuthFeature> {
 
   Future<void> _pushData(String typeOfUsers, String userId) async {
     try {
-      await FirebaseFirestore.instance.collection(typeOfUsers).doc(userId).set({
-        "username": "dummy",
-        "userStatus": _authData["userStatus"],
-      });
+      await FirebaseFirestore.instance
+          .collection(typeOfUsers)
+          .doc(userId)
+          .set({"username": "dummy"});
     } catch (error) {
       print(error);
       throw error;
@@ -135,13 +134,16 @@ class _AuthFeatureState extends State<AuthFeature> {
   Future<void> _onSubmitted() async {
     if (!_form.currentState.validate()) return;
     _form.currentState.save();
+    print("something");
     if (_authStatus == AuthStatus.login) {
       setState(() {
         _isLoading = true;
       });
       try {
+        print("dm");
         await _firebaseAuth.signInWithEmailAndPassword(
             email: _authData["email"], password: _authData["password"]);
+        print("cc");
       } on FirebaseAuthException catch (error) {
         if (error.code == 'user-not-found') {
           ScaffoldMessenger.of(context).showSnackBar(
