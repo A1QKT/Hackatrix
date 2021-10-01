@@ -1,8 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-
+import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:local_assistance/providers/auth.dart';
+
+import '../providers/auth.dart';
 import '../constant/regex_const.dart';
 
 enum AuthStatus {
@@ -46,23 +47,104 @@ class _AuthFeatureState extends State<AuthFeature> {
     "userName": null,
     "email": null,
     "password": null,
+    "userStatus": null,
   };
   final _focusPassword = FocusNode();
   final _focusConfirmPassword = FocusNode();
   final _form = GlobalKey<FormState>();
   TextEditingController _email = TextEditingController();
 
+  Future<void> _pushData(String typeOfUsers, String userId) async {
+    try {
+      await FirebaseFirestore.instance.collection(typeOfUsers).doc(userId).set({
+        'fullname': '',
+        'location': '',
+        'phonenumber': '',
+      });
+    } catch (error) {
+      print(error);
+      throw error;
+    }
+  }
+
+  Future<void> _signUp(String typeOfUser) async {
+    try {
+      final response = await _firebaseAuth.createUserWithEmailAndPassword(
+          email: _authData["email"], password: _authData["password"]);
+      await _pushData(typeOfUser, response.user.uid);
+    } on FirebaseAuthException catch (error) {
+      setState(() {
+        _isLoading = false;
+      });
+      if (error.code == 'weak-password') {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text("weak password")));
+      } else if (error.code == 'email-already-in-use') {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text("email already exist")));
+      }
+    } on FirebaseException catch (error) {
+      setState(() {
+        _isLoading = false;
+      });
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(error.message)));
+    } catch (error) {
+      setState(() {
+        _isLoading = false;
+      });
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("Something went wrong")));
+      print(error);
+    }
+  }
+
+  Future<void> _showDiagram() {
+    return showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text("You are?"),
+        actions: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              FlatButton(
+                  onPressed: () async {
+                    Provider.of<Auth>(ctx, listen: false)
+                        .setUserStatus(UserStatus.local);
+                    Navigator.of(ctx).pop();
+                    await _signUp("Locals");
+                  },
+                  child: Text("Local")),
+              FlatButton(
+                onPressed: () async {
+                  Provider.of<Auth>(ctx, listen: false)
+                      .setUserStatus(UserStatus.traveller);
+                  Navigator.of(ctx).pop();
+                  await _signUp("Users");
+                },
+                child: Text("User"),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<void> _onSubmitted() async {
     if (!_form.currentState.validate()) return;
     _form.currentState.save();
-    print(_authData);
+    print("something");
     if (_authStatus == AuthStatus.login) {
       setState(() {
         _isLoading = true;
       });
       try {
+        print("dm");
         await _firebaseAuth.signInWithEmailAndPassword(
             email: _authData["email"], password: _authData["password"]);
+        print("cc");
       } on FirebaseAuthException catch (error) {
         if (error.code == 'user-not-found') {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -81,27 +163,8 @@ class _AuthFeatureState extends State<AuthFeature> {
       setState(() {
         _isLoading = true;
       });
-      try {
-        UserCredential user =
-            await _firebaseAuth.createUserWithEmailAndPassword(
-                email: _authData["email"], password: _authData["password"]);
-        FirebaseFirestore.instance.collection('users').doc(user.user.uid).set({
-          'fullname': '',
-          'location': '',
-          'phonenumber': '',
-        });
-      } on FirebaseAuthException catch (error) {
-        if (error.code == 'weak-password') {
-          ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text("weak password")));
-        } else if (error.code == 'email-already-in-use') {
-          ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text("email already exist")));
-        }
-      } catch (error) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text("Something went wrong")));
-      }
+      _showDiagram();
+
       setState(() {
         _isLoading = false;
       });

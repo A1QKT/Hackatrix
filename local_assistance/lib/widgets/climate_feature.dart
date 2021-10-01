@@ -45,7 +45,7 @@ class _ClimateFeatureState extends State<ClimateFeature> {
     return FutureBuilder(
       future: getWeather(widget.city, widget.stateCode),
       builder: (ctx, snapShot) {
-        print(snapShot.data);
+        // print(snapShot.data);
         if (snapShot.connectionState == ConnectionState.waiting)
           return CircularProgressIndicator();
         if (snapShot.error != null) return Text("Not found");

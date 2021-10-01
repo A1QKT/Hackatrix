@@ -16,6 +16,7 @@ class HashtagWidget extends StatefulWidget {
 class _HashtagWidgetState extends State<HashtagWidget> {
   @override
   Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
     List<String> hashtag = widget.hashtagStatus.entries.map((e) {
       return e.key;
     }).toList();

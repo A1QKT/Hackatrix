@@ -93,6 +93,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       }
     }
 
+    final screenSize = MediaQuery.of(context).size;
+
     return GestureDetector(
       onTap: () => FocusScope.of(context).requestFocus(new FocusNode()),
       child: Scaffold(
