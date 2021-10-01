@@ -3,21 +3,18 @@ import 'package:flutter/material.dart';
 import './drawer.dart';
 import '../widgets/main_feature.dart';
 import '../widgets/wallet.dart';
-
 import './menu_screen.dart';
 
-class UserSCreen extends StatefulWidget {
+class LocalScreen extends StatefulWidget {
   @override
-  _UserSCreenState createState() => _UserSCreenState();
+  _LocalScreenState createState() => _LocalScreenState();
 }
 
-class _UserSCreenState extends State<UserSCreen> {
+class _LocalScreenState extends State<LocalScreen> {
   bool _isNavigate = true;
   int _currentIndex = 0;
   @override
   Widget build(BuildContext context) {
-    // CollectionReference userInformations =
-    //     FirebaseFirestore.instance.collection("userInformations");
     return Scaffold(
       appBar: AppBar(),
       drawer: DrawerSheet(),
@@ -72,11 +69,10 @@ class _UserSCreenState extends State<UserSCreen> {
         },
         items: [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: "home"),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.notification_add), label: "notification"),
           BottomNavigationBarItem(icon: Icon(Icons.menu), label: "menu"),
         ],
       ),
     );
+    ;
   }
 }
