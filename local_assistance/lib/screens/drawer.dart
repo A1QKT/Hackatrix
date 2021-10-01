@@ -37,7 +37,7 @@ class DrawerSheet extends StatelessWidget {
               SizedBox(height: 15),
               FutureBuilder(
                   future: FirebaseFirestore.instance
-                      .collection('users')
+                      .collection('Users')
                       .doc(FirebaseAuth.instance.currentUser.uid)
                       .get(),
                   builder: (context,
