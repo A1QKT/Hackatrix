@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:local_assistance/screens/auth_screen.dart';
 
 import 'package:local_assistance/screens/main_screen.dart';
 import 'package:local_assistance/screens/menu_screen.dart';
@@ -34,7 +35,7 @@ class MyApp extends StatelessWidget {
               print("Something went wrong");
             }
             if (userSnapshot.hasData) return MainScreen(userSnapshot.data.uid);
-            return Text("Something wrong");
+            return AuthScreen();
           },
         ),
         routes: {
