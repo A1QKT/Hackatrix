@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import './drawer.dart';
 import '../widgets/main_feature.dart';
 import '../widgets/wallet.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class UserSCreen extends StatefulWidget {
   @override
@@ -65,6 +66,7 @@ class _UserSCreenState extends State<UserSCreen> {
               _isNavigate = true;
             else
               _isNavigate = false;
+            FirebaseAuth.instance.signOut();
             print(_isNavigate);
           });
         },

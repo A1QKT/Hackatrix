@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import './drawer.dart';
 import '../widgets/main_feature.dart';
 import '../widgets/wallet.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class MainSCreen extends StatefulWidget {
   @override
