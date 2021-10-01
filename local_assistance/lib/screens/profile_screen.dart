@@ -32,21 +32,42 @@ class _ProfileScreenState extends State<ProfileScreen> {
   var _phonenumberFocus = FocusNode();
 
   var _passwordFocus = FocusNode();
-
-  void _takeImage() async {
-    final pickImageFile =
-        await ImagePicker.pickImage(source: ImageSource.camera);
-    setState(() {
-      _pickedImage = pickImageFile;
-    });
+  void saveImg(File img) {
+    _pickedImage = img;
   }
 
-  void _pickImage() async {
-    final pickImageFile =
-        await ImagePicker.pickImage(source: ImageSource.gallery);
-    setState(() {
-      _pickedImage = pickImageFile;
-    });
+  void saveForm(BuildContext context) async {
+    if (!_formKey.currentState.validate()) {
+      return;
+    }
+    _formKey.currentState.save();
+    try {
+      await FirebaseFirestore.instance
+          .collection('Users')
+          .doc(FirebaseAuth.instance.currentUser.uid)
+          .set({
+        'fullname': _fullname,
+        'location': _location,
+        'phonenumber': _phoneNumber,
+      });
+      if (_pickedImage != null) {
+        final ref = FirebaseStorage.instance
+            .ref()
+            .child('user_image')
+            .child(FirebaseAuth.instance.currentUser.uid + '.jpg');
+        await ref.putFile(_pickedImage).whenComplete(() => null);
+      }
+      if (_password != 'obscureText') {
+        await FirebaseAuth.instance.currentUser.updatePassword(_password);
+      }
+      Navigator.of(context).pop();
+      Navigator.of(context).pop();
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Save successfully')));
+    } on FirebaseAuthException catch (error) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(error.toString())));
+    }
   }
 
   @override
@@ -59,42 +80,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    void saveForm() async {
-      if (!_formKey.currentState.validate()) {
-        return;
-      }
-      _formKey.currentState.save();
-      try {
-        await FirebaseFirestore.instance
-            .collection('Users')
-            .doc(FirebaseAuth.instance.currentUser.uid)
-            .set({
-          'fullname': _fullname,
-          'location': _location,
-          'phonenumber': _phoneNumber,
-        });
-        if (_pickedImage != null) {
-          final ref = FirebaseStorage.instance
-              .ref()
-              .child('user_image')
-              .child(FirebaseAuth.instance.currentUser.uid + '.jpg');
-          await ref.putFile(_pickedImage).whenComplete(() => null);
-        }
-        if (_password != 'obscureText') {
-          await FirebaseAuth.instance.currentUser.updatePassword(_password);
-        }
-        Navigator.of(context).pop();
-        Navigator.of(context).pop();
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Save successfully')));
-      } on FirebaseAuthException catch (error) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(error.toString())));
-      }
-    }
-
     return GestureDetector(
-      onTap: () => FocusScope.of(context).requestFocus(new FocusNode()),
+      onTap: () => FocusManager.instance.primaryFocus.unfocus(),
       child: Scaffold(
         appBar: AppBar(
           title: Text('My Profile'),
@@ -116,102 +103,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               return SingleChildScrollView(
                 child: Column(
                   children: [
-                    Container(
-                      height: 150,
-                      child: Stack(
-                        fit: StackFit.expand,
-                        children: [
-                          Positioned(
-                            top: 0,
-                            width: screenSize.width,
-                            child: Container(
-                              height: 100,
-                              decoration: BoxDecoration(
-                                color: Colors.amber[400],
-                              ),
-                            ),
-                          ),
-                          Positioned(
-                            child: Container(
-                              width: 120,
-                              height: 120,
-                              child: Stack(
-                                fit: StackFit.expand,
-                                children: [
-                                  Positioned(
-                                    top: 0,
-                                    child: FutureBuilder(
-                                      future: FirebaseStorage.instance
-                                          .ref('user_image/' +
-                                              FirebaseAuth
-                                                  .instance.currentUser.uid +
-                                              '.jpg')
-                                          .getDownloadURL(),
-                                      builder: (context, snapshot) {
-                                        return CircleAvatar(
-                                          radius: 60,
-                                          backgroundColor: Colors.amberAccent,
-                                          backgroundImage: _pickedImage != null
-                                              ? FileImage(_pickedImage)
-                                              : (snapshot.data == null)
-                                                  ? null
-                                                  : NetworkImage(snapshot.data),
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                  Positioned(
-                                    bottom: 0,
-                                    right: 0,
-                                    child: PopupMenuButton(
-                                      itemBuilder: (context) {
-                                        var list =
-                                            List<PopupMenuEntry<Object>>();
-                                        list.add(
-                                          PopupMenuItem(
-                                            child: InkWell(
-                                              onTap: _takeImage,
-                                              child: Text("Take a photo"),
-                                            ),
-                                            value: 1,
-                                          ),
-                                        );
-                                        list.add(
-                                          PopupMenuDivider(
-                                            height: 10,
-                                          ),
-                                        );
-                                        list.add(
-                                          PopupMenuItem(
-                                            child: InkWell(
-                                              onTap: _pickImage,
-                                              child: Text(
-                                                  "Pick a photo from gallery"),
-                                            ),
-                                            value: 2,
-                                          ),
-                                        );
-                                        return list;
-                                      },
-                                      child: Container(
-                                        width: 40,
-                                        padding: EdgeInsets.all(5),
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          color: Colors.white,
-                                        ),
-                                        child: Icon(Icons.camera_alt),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            right: screenSize.width * 0.5 - 60,
-                            bottom: 1,
-                          ),
-                        ],
-                      ),
+                    AvatarHeading(
+                      saveImg: saveImg,
                     ),
                     Form(
                       key: _formKey,
@@ -284,7 +177,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                           ),
                           GestureDetector(
-                            onTap: saveForm,
+                            onTap: () => saveForm(context),
                             child: Container(
                               alignment: Alignment.center,
                               decoration: BoxDecoration(
@@ -308,6 +201,134 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               );
             }),
+      ),
+    );
+  }
+}
+
+class AvatarHeading extends StatefulWidget {
+  final Function saveImg;
+  AvatarHeading({this.saveImg});
+  @override
+  _AvatarHeadingState createState() => _AvatarHeadingState();
+}
+
+class _AvatarHeadingState extends State<AvatarHeading> {
+  File pickImage;
+  @override
+  Widget build(BuildContext context) {
+    void _takeImage() async {
+      final pickImageFile =
+          await ImagePicker.pickImage(source: ImageSource.camera);
+      setState(() {
+        pickImage = pickImageFile;
+      });
+      Navigator.of(context).pop();
+      widget.saveImg(pickImageFile);
+    }
+
+    void _pickImage() async {
+      final pickImageFile =
+          await ImagePicker.pickImage(source: ImageSource.gallery);
+      setState(() {
+        pickImage = pickImageFile;
+      });
+      Navigator.of(context).pop();
+      widget.saveImg(pickImageFile);
+    }
+
+    return Container(
+      height: 150,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          Positioned(
+            top: 0,
+            width: screenSize.width,
+            child: Container(
+              height: 100,
+              decoration: BoxDecoration(
+                color: Colors.amber[400],
+              ),
+            ),
+          ),
+          Positioned(
+            child: Container(
+              width: 120,
+              height: 120,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  Positioned(
+                    top: 0,
+                    child: FutureBuilder(
+                      future: FirebaseStorage.instance
+                          .ref('user_image/' +
+                              FirebaseAuth.instance.currentUser.uid +
+                              '.jpg')
+                          .getDownloadURL(),
+                      builder: (context, snapshot) {
+                        return CircleAvatar(
+                          radius: 60,
+                          backgroundColor: Colors.amberAccent,
+                          backgroundImage: pickImage != null
+                              ? FileImage(pickImage)
+                              : (snapshot.data == null)
+                                  ? null
+                                  : NetworkImage(snapshot.data),
+                        );
+                      },
+                    ),
+                  ),
+                  Positioned(
+                    bottom: 0,
+                    right: 0,
+                    child: PopupMenuButton(
+                      itemBuilder: (context) {
+                        var list = List<PopupMenuEntry<Object>>();
+                        list.add(
+                          PopupMenuItem(
+                            child: InkWell(
+                              onTap: _takeImage,
+                              child: Text("Take a photo"),
+                            ),
+                            value: 1,
+                          ),
+                        );
+                        list.add(
+                          PopupMenuDivider(
+                            height: 10,
+                          ),
+                        );
+                        list.add(
+                          PopupMenuItem(
+                            child: InkWell(
+                              onTap: _pickImage,
+                              child: Text("Pick a photo from gallery"),
+                            ),
+                            value: 2,
+                          ),
+                        );
+                        return list;
+                      },
+                      child: Container(
+                        width: 40,
+                        padding: EdgeInsets.all(5),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white,
+                        ),
+                        child: Icon(Icons.camera_alt),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            right: screenSize.width * 0.5 - 60,
+            bottom: 1,
+          ),
+        ],
       ),
     );
   }
