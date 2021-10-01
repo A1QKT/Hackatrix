@@ -5,6 +5,8 @@ import './local_screen.dart';
 import './user_screen.dart';
 import '../providers/auth.dart';
 
+Size screenSize;
+
 class MainScreen extends StatefulWidget {
   final String uid;
   MainScreen(this.uid);
@@ -27,7 +29,7 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    print("ok");
+    screenSize = MediaQuery.of(context).size;
     return FutureBuilder(
         future: fetchDataUser(widget.uid),
         builder: (_, snapsot) => (userStatus == UserStatus.traveller)

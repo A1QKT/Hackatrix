@@ -66,7 +66,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       _formKey.currentState.save();
       try {
         await FirebaseFirestore.instance
-            .collection('users')
+            .collection('Users')
             .doc(FirebaseAuth.instance.currentUser.uid)
             .set({
           'fullname': _fullname,
@@ -93,8 +93,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       }
     }
 
-    final screenSize = MediaQuery.of(context).size;
-
     return GestureDetector(
       onTap: () => FocusScope.of(context).requestFocus(new FocusNode()),
       child: Scaffold(
@@ -105,7 +103,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
         body: StreamBuilder(
             stream: FirebaseFirestore.instance
-                .collection('users')
+                .collection('Users')
                 .doc(FirebaseAuth.instance.currentUser.uid)
                 .snapshots(),
             builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
