@@ -5,7 +5,9 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:local_assistance/providers/auth.dart';
 import 'package:local_assistance/screens/main_screen.dart';
+import 'package:provider/provider.dart';
 
 class ProfileScreen extends StatefulWidget {
   static String routName = '/profile-screen';
@@ -80,6 +82,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    Auth auth = Provider.of<Auth>(context, listen: false);
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus.unfocus(),
       child: Scaffold(
@@ -90,7 +93,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
         body: StreamBuilder(
             stream: FirebaseFirestore.instance
-                .collection('Users')
+                .collection(auth.getStatusString())
                 .doc(FirebaseAuth.instance.currentUser.uid)
                 .snapshots(),
             builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
