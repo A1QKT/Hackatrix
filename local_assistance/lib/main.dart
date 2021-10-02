@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/services.dart';
 import 'package:local_assistance/screens/auth_screen.dart';
 
 import 'package:local_assistance/screens/main_screen.dart';
@@ -17,6 +18,9 @@ import './providers/auth.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+  ]);
   await Firebase.initializeApp();
   runApp(MyApp());
 }
@@ -28,6 +32,9 @@ class MyApp extends StatelessWidget {
       create: (_) => Auth(),
       child: MaterialApp(
         title: 'Local Assistance',
+        theme: ThemeData(
+          primaryColor: Colors.deepPurple,
+        ),
         home: StreamBuilder(
           stream: FirebaseAuth.instance.authStateChanges(),
           builder: (ctx, AsyncSnapshot<User> userSnapshot) {
