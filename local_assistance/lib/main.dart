@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
 import 'package:local_assistance/screens/auth_screen.dart';
+import 'package:local_assistance/screens/chat_screen.dart';
 
 import 'package:local_assistance/screens/main_screen.dart';
 import 'package:local_assistance/screens/menu_screen.dart';
@@ -41,7 +42,11 @@ class MyApp extends StatelessWidget {
             if (userSnapshot.error != null) {
               print("Something went wrong");
             }
-            if (userSnapshot.hasData) return MainScreen(userSnapshot.data.uid);
+            if (userSnapshot.hasData) {
+              Provider.of<Auth>(ctx, listen: false)
+                  .setUid(userSnapshot.data.uid);
+              return MainScreen(userSnapshot.data.uid);
+            }
             return AuthScreen();
           },
         ),
@@ -53,6 +58,7 @@ class MyApp extends StatelessWidget {
           HistoryScreen.routName: (ctx) => HistoryScreen(),
           ProfileScreen.routName: (ctx) => ProfileScreen(),
           AcceptionScreen.routName: (ctx) => AcceptionScreen(),
+          ChatScreen.routeName: (ctx) => ChatScreen(uidB: "123"),
         },
       ),
     );
