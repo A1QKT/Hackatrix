@@ -2,14 +2,17 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:local_assistance/providers/auth.dart';
 import 'package:local_assistance/screens/history_screen.dart';
 import 'package:local_assistance/screens/profile_screen.dart';
 import 'package:local_assistance/screens/setting_screen.dart';
+import 'package:provider/provider.dart';
 
 class DrawerSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
+    Auth auth = Provider.of<Auth>(context, listen: false);
     return Drawer(
       child: SingleChildScrollView(
         child: SafeArea(
@@ -37,7 +40,7 @@ class DrawerSheet extends StatelessWidget {
               SizedBox(height: 15),
               FutureBuilder(
                   future: FirebaseFirestore.instance
-                      .collection('Users')
+                      .collection(auth.getStatusString())
                       .doc(FirebaseAuth.instance.currentUser.uid)
                       .get(),
                   builder: (context,

@@ -4,6 +4,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import './local_screen.dart';
 import './user_screen.dart';
 import '../providers/auth.dart';
+import 'package:provider/provider.dart';
+
+Size screenSize;
 
 class MainScreen extends StatefulWidget {
   final String uid;
@@ -14,23 +17,23 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  UserStatus userStatus;
-  Future<void> fetchDataUser(String uid) async {
-    final response =
-        await FirebaseFirestore.instance.collection("Users").doc(uid).get();
-    print(response.exists);
-    if (response.exists)
-      userStatus = UserStatus.traveller;
-    else
-      userStatus = UserStatus.local;
-  }
-
   @override
   Widget build(BuildContext context) {
-    print("ok");
+    Auth auth = Provider.of<Auth>(context, listen: false);
+    Future<void> fetchDataUser(String uid) async {
+      final response =
+          await FirebaseFirestore.instance.collection("Users").doc(uid).get();
+      print(response.exists);
+      if (response.exists)
+        auth.setUserStatus(UserStatus.traveller);
+      else
+        auth.setUserStatus(UserStatus.local);
+    }
+
+    screenSize = MediaQuery.of(context).size;
     return FutureBuilder(
         future: fetchDataUser(widget.uid),
-        builder: (_, snapsot) => (userStatus == UserStatus.traveller)
+        builder: (_, snapsot) => (auth.getUserStatus == UserStatus.traveller)
             ? UserSCreen()
             : LocalScreen());
   }
