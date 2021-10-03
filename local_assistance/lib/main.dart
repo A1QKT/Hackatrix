@@ -58,7 +58,7 @@ class MyApp extends StatelessWidget {
           HistoryScreen.routName: (ctx) => HistoryScreen(),
           ProfileScreen.routName: (ctx) => ProfileScreen(),
           AcceptionScreen.routName: (ctx) => AcceptionScreen(),
-          ChatScreen.routeName: (ctx) => ChatScreen(uidB: "123"),
+          ChatScreen.routeName: (ctx) => ChatScreen(uidB: "krgLDaEkfthuN4b1VHuXHdFFDi33"),
         },
       ),
     );
