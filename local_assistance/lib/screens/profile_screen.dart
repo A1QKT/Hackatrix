@@ -82,6 +82,42 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    void saveForm() async {
+      if (!_formKey.currentState.validate()) {
+        return;
+      }
+      _formKey.currentState.save();
+      try {
+        await FirebaseFirestore.instance
+            .collection('Users')
+            .doc(FirebaseAuth.instance.currentUser.uid)
+            .set({
+          'fullname': _fullname,
+          'location': _location,
+          'phonenumber': _phoneNumber,
+        });
+        if (_pickedImage != null) {
+          final ref = FirebaseStorage.instance
+              .ref()
+              .child('user_image')
+              .child(FirebaseAuth.instance.currentUser.uid + '.jpg');
+          await ref.putFile(_pickedImage).whenComplete(() => null);
+        }
+        if (_password != 'obscureText') {
+          await FirebaseAuth.instance.currentUser.updatePassword(_password);
+        }
+        Navigator.of(context).pop();
+        Navigator.of(context).pop();
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Save successfully')));
+      } on FirebaseAuthException catch (error) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(error.toString())));
+      }
+    }
+
+    final screenSize = MediaQuery.of(context).size;
+
     Auth auth = Provider.of<Auth>(context, listen: false);
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus.unfocus(),
@@ -180,7 +216,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                           ),
                           GestureDetector(
-                            onTap: () => saveForm(context),
+                            onTap: () => saveForm(),
                             child: Container(
                               alignment: Alignment.center,
                               decoration: BoxDecoration(

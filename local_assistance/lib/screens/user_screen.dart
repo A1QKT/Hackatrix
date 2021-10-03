@@ -5,6 +5,7 @@ import '../widgets/main_feature.dart';
 import '../widgets/wallet.dart';
 
 import './menu_screen.dart';
+import './chat_screen.dart';
 
 class UserSCreen extends StatefulWidget {
   @override
@@ -68,6 +69,7 @@ class _UserSCreenState extends State<UserSCreen> {
             else
               _isNavigate = false;
             print(_isNavigate);
+            Navigator.of(context).pushNamed(ChatScreen.routeName);
           });
         },
         items: [
