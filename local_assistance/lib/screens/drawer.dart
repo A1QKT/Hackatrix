@@ -19,46 +19,46 @@ class DrawerSheet extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Container(
-                margin: EdgeInsets.all(10),
-                child: FutureBuilder(
-                    future: FirebaseStorage.instance
-                        .ref('user_image/' +
-                            FirebaseAuth.instance.currentUser.uid +
-                            '.jpg')
-                        .getDownloadURL(),
-                    builder: (context, snapshot) {
-                      return CircleAvatar(
-                        radius: size.width * 0.17,
-                        backgroundColor: Colors.amberAccent,
-                        backgroundImage: snapshot.data != null
-                            ? NetworkImage(snapshot.data)
-                            : null,
-                      );
-                    }),
-              ),
-              SizedBox(height: 15),
-              FutureBuilder(
-                  future: FirebaseFirestore.instance
-                      .collection(auth.getStatusString())
-                      .doc(FirebaseAuth.instance.currentUser.uid)
-                      .get(),
-                  builder: (context,
-                      AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>>
-                          snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Text('Loading...');
-                    }
-                    return Text(
-                      snapshot.data.data()['fullname'],
-                      style: TextStyle(
-                        fontSize: 20,
-                      ),
-                    );
-                  }),
-              SizedBox(height: 15),
-              Text(FirebaseAuth.instance.currentUser.email),
-              SizedBox(height: 15),
+              // Container(
+              //   margin: EdgeInsets.all(10),
+              //   child: FutureBuilder(
+              //       future: FirebaseStorage.instance
+              //           .ref('user_image/' +
+              //               FirebaseAuth.instance.currentUser.uid +
+              //               '.jpg')
+              //           .getDownloadURL(),
+              //       builder: (context, snapshot) {
+              //         return CircleAvatar(
+              //           radius: size.width * 0.17,
+              //           backgroundColor: Colors.amberAccent,
+              //           backgroundImage: snapshot.data != null
+              //               ? NetworkImage(snapshot.data)
+              //               : null,
+              //         );
+              //       }),
+              // ),
+              // SizedBox(height: 15),
+              // FutureBuilder(
+              //     future: FirebaseFirestore.instance
+              //         .collection(auth.getStatusString())
+              //         .doc(FirebaseAuth.instance.currentUser.uid)
+              //         .get(),
+              //     builder: (context,
+              //         AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>>
+              //             snapshot) {
+              //       if (snapshot.connectionState == ConnectionState.waiting) {
+              //         return Text('Loading...');
+              //       }
+              //       return Text(
+              //         snapshot.data.data()['fullname'],
+              //         style: TextStyle(
+              //           fontSize: 20,
+              //         ),
+              //       );
+              //     }),
+              // SizedBox(height: 15),
+              // Text(FirebaseAuth.instance.currentUser.email),
+              // SizedBox(height: 15),
               Container(
                 alignment: Alignment.center,
                 margin: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
